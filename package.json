@@ -1,0 +1,11 @@
+{
+  "name": "Interpreter",
+  "version": "0.0.1",
+  "description": "Simple interpreter",
+  "main": "interpretator.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC"
+}
