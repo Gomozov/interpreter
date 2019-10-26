@@ -1,7 +1,6 @@
-function Interpreter()
-{
-    this.vars = {};
-    this.functions = {};
+function Interpreter() {
+  this.vars = {};
+  this.functions = {};
 }
 
 Interpreter.prototype.toObject = function (arr) {
@@ -18,45 +17,46 @@ Interpreter.prototype.toObject = function (arr) {
 Interpreter.prototype.tokenize = function (program) {
     if (program === "")
         return [];
-    const regex = /\s*([-+*\/\%=\(\)]|[A-Za-z_][A-Za-z0-9_]*|[0-9]*\.?[0-9]+)\s*/g;
+    const regex = /([A-Za-z_][A-Za-z0-9_]*|(?<!\w)-[0-9]*\.?[0-9]+|[-+*\/\%=\(\)]|\s+)/g;
     return program.split(regex).filter(function (s) { return !s.match(/^\s*$/); });
 };
 
 Interpreter.prototype.input = function (expr) {
-    //console.log("**********INPUT:", expr, "**********");
-    //console.log("FUNCTION INPUT:", this.functions);
-    //console.log("VARIABLES INPUT:", this.vars);
-    let tkns = this.tokenize(expr);
-    if (tkns.length === 0) {
-      return "";
+  //console.log("**********INPUT:", expr, "**********");
+  //console.log("FUNCTION INPUT:", this.functions);
+  //console.log("VARIABLES INPUT:", this.vars);
+  let tkns = this.tokenize(expr);
+  //console.log("TKNS:", tkns);
+  if (tkns.length === 0) {
+    return "";
+  }
+  //***** Add functions *****
+  if (tkns[0] === "fn") {
+    if (this.vars.hasOwnProperty(tkns[1])) {
+      throw new Error("ERROR: Name conflict. \'" + tkns[1] + "\' is a variable.");
     }
-    //***** Add functions *****
-    if (tkns[0] === "fn") {
-      if (this.vars.hasOwnProperty(tkns[1])) {
-        throw new Error("ERROR: Name conflict. \'" + tkns[1] + "\' is a variable.");
-      }
-      let dlm = tkns.findIndex((e,i,a) => (e === "=") ? true : false);
-      let vrbls = this.toObject(tkns.slice(2, dlm));
-      let expn = tkns.slice(dlm+2, tkns.length);
-      for (let i = 0; i < expn.length; i += 1) {
-        if (expn[i].match(/[A-Za-z][A-Za-z0-9_]*/)) {
-          if (!vrbls.hasOwnProperty(expn[i])) {
-            throw new Error("ERROR: Invalid identifier \'" + expn[i] + "\' in function body.");
-          }
-        }  
-      }
-      this.functions[tkns[1]] = {"variables": vrbls, "expression": expn};
-      return "";
+    let dlm = tkns.findIndex((e,i,a) => (e === "=") ? true : false);
+    let vrbls = this.toObject(tkns.slice(2, dlm));
+    let expn = tkns.slice(dlm+2, tkns.length);
+    for (let i = 0; i < expn.length; i += 1) {
+      if (expn[i].match(/[A-Za-z][A-Za-z0-9_]*/)) {
+        if (!vrbls.hasOwnProperty(expn[i])) {
+          throw new Error("ERROR: Invalid identifier \'" + expn[i] + "\' in function body.");
+        }
+      }  
     }
+    this.functions[tkns[1]] = {"variables": vrbls, "expression": expn};
+    return "";
+  }
     
-    tkns = this.parenthesis(tkns);
-    tkns = this.calculate(tkns);
+  tkns = this.parenthesis(tkns);
+  tkns = this.calculate(tkns);
        
-    //console.log("FINAL:", tkns);
-    if (isNaN(Number(tkns))) {
-      throw new Error('Error! Result is NaN');
-    }
-    return Number(tkns);
+  //console.log("FINAL:", tkns);
+  if (isNaN(Number(tkns))) {
+    throw new Error('Error! Result is NaN');
+  }
+  return Number(tkns);
 }
 
 Interpreter.prototype.parenthesis = function (tokens) {

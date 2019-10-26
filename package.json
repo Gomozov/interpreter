@@ -1,11 +1,14 @@
 {
   "name": "Interpreter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Simple interpreter",
   "main": "interpretator.js",
   "scripts": {
     "test": "mocha"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^4.2.0"
+  }
 }

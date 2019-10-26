@@ -37,7 +37,11 @@ rl.on('line', (line) => {
       get_help();
       break;
     default:
-      console.log(intr.input(line.trim()));
+      try {
+        console.log(intr.input(line.trim()));
+      } catch (err) {
+        console.log(err);
+      }
       break;
   }
   rl.prompt();
